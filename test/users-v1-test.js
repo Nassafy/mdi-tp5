@@ -1,155 +1,78 @@
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-const {app} = require('../app')
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const { app } = require("../app");
 
-chai.should()
-chai.use(chaiHttp)
+chai.should();
+chai.use(chaiHttp);
 
-describe('Users tests', () => {
-  it('should list ALL users on /v1/users GET', done => {
+describe("Users tests", () => {
+  it("should list ALL users on /v1/users GET", done => {
     chai
       .request(app)
-      .get('/v1/users')
+      .get("/v1/users")
       .end((err, res) => {
-        res
-          .should
-          .have
-          .status(200)
-        res.should.be.json
-        res
-          .body
-          .should
-          .be
-          .a('array')
-        done()
-      })
-  })
-  it('should list a SINGLE user on /v1/users/<id> GET', done => {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a("array");
+        done();
+      });
+  });
+  it("should list a SINGLE user on /v1/users/<id> GET", done => {
     chai
       .request(app)
-      .get('/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e')
+      .get("/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e")
       .end((err, res) => {
-        res
-          .should
-          .have
-          .status(200)
-        res.should.be.json
-        res
-          .body
-          .should
-          .be
-          .a('object')
-        res
-          .body
-          .should
-          .have
-          .property('id')
-        res
-          .body
-          .id
-          .should
-          .equal('45745c60-7b1a-11e8-9c9c-2d42b21b1a3e')
-        done()
-      })
-  })
-  it('should add a SINGLE user on /v1/users POST', done => {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a("object");
+        res.body.should.have.property("id");
+        res.body.id.should.equal("45745c60-7b1a-11e8-9c9c-2d42b21b1a3e");
+        done();
+      });
+  });
+  it("should add a SINGLE user on /v1/users POST", done => {
     chai
       .request(app)
-      .post('/v1/users')
-      .send({name: 'Robert', login: 'roro', password: 'robpass'})
+      .post("/v1/users")
+      .send({ name: "Robert", login: "roro", password: "robpass" })
       .end((err, res) => {
-        res
-          .should
-          .have
-          .status(201)
-        res.should.be.json
-        res
-          .body
-          .should
-          .be
-          .a('object')
-        res
-          .body
-          .should
-          .have
-          .property('id')
-        res
-          .body
-          .should
-          .have
-          .property('name')
-        res
-          .body
-          .name
-          .should
-          .equal('Robert')
-        res
-          .body
-          .name
-          .should
-          .equal('Robert')
-        res
-          .body
-          .name
-          .should
-          .equal('Robert')
-        res
-          .body
-          .login
-          .should
-          .equal('roro')
-        done()
-      })
-  })
-  it('should update a SINGLE user on /v1/users/<id> PATCH', done => {
+        res.should.have.status(201);
+        res.should.be.json;
+        res.body.should.be.a("object");
+        res.body.should.have.property("id");
+        res.body.should.have.property("name");
+        res.body.name.should.equal("Robert");
+        res.body.name.should.equal("Robert");
+        res.body.name.should.equal("Robert");
+        res.body.login.should.equal("roro");
+        res.body.password.should.not.equal("robpass")
+        done();
+      });
+  });
+  it("should update a SINGLE user on /v1/users/<id> PATCH", done => {
     chai
       .request(app)
-      .patch('/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e')
-      .send({name: 'Robertinio', password: 'newpassword'})
+      .patch("/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e")
+      .send({ name: "Robertinio", password: "newpassword" })
       .end((err, res) => {
-        res
-          .should
-          .have
-          .status(200)
-        res.should.be.json
-        res
-          .body
-          .should
-          .be
-          .a('object')
-        res
-          .body
-          .should
-          .have
-          .property('id')
-        res
-          .body
-          .id
-          .should
-          .equal('45745c60-7b1a-11e8-9c9c-2d42b21b1a3e')
-        res
-          .body
-          .name
-          .should
-          .equal('Robertinio')
-        res
-          .body
-          .login
-          .should
-          .equal('pedro')
-        done()
-      })
-  })
-  it('should delete a SINGLE user on /v1/users/<id> DELETE', done => {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a("object");
+        res.body.should.have.property("id");
+        res.body.id.should.equal("45745c60-7b1a-11e8-9c9c-2d42b21b1a3e");
+        res.body.name.should.equal("Robertinio");
+        res.body.login.should.equal("pedro");
+        res.body.password.should.not.equal("newpassword");
+        done();
+      });
+  });
+  it("should delete a SINGLE user on /v1/users/<id> DELETE", done => {
     chai
       .request(app)
-      .delete('/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e')
+      .delete("/v1/users/45745c60-7b1a-11e8-9c9c-2d42b21b1a3e")
       .end((err, res) => {
-        res
-          .should
-          .have
-          .status(200)
-        done()
-      })
-  })
-})
+        res.should.have.status(200);
+        done();
+      });
+  });
+});
