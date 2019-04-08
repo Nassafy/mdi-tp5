@@ -20,6 +20,7 @@ const users = [
     id: "987sd88a-45q6-78d8-4565-2d42b21b1a3e",
     name: "Rose Doolan",
     login: "rose",
+    password: bcrypt.hashSync("vert", salt_round),
     age: 36
   },
   {
@@ -97,7 +98,7 @@ const remove = id => {
 
 function validateUser(user) {
   let result = true;
-  if (user && user.id && user.login && user.name) {
+  if (user && user.id && user.login && user.name && user.password) {
     result = true;
   }
   return result;
