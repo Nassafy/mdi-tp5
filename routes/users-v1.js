@@ -5,6 +5,7 @@ let usersModel = undefined
 
 /* Control usermodel initialisation */
 router.use((req, res, next) => {
+  /* istanbul ignore if */
   if (!usersModel) {
     res
       .status(500)
@@ -16,6 +17,8 @@ router.use((req, res, next) => {
 /* GET a specific user by id */
 router.get('/:id', function (req, res, next) {
   const id = req.params.id
+
+  /* istanbul ignore else */
   if (id) {
     try {
       const userFound = usersModel.get(id)
@@ -27,6 +30,7 @@ router.get('/:id', function (req, res, next) {
           .json({message: `User not found with id ${id}`})
       }
     } catch (exc) {
+      /* istanbul ignore next */
       res
         .status(400)
         .json({message: exc.message})
@@ -43,6 +47,7 @@ router.get('/:id', function (req, res, next) {
 router.post('/', function (req, res, next) {
   const newUser = req.body
 
+  /* istanbul ignore else */
   if (newUser) {
     try {
       const user = usersModel.add(newUser)
@@ -67,24 +72,21 @@ router.patch('/:id', function (req, res, next) {
   const id = req.params.id
   const newUserProperties = req.body
 
+  /* istanbul ignore else */
   if (id && newUserProperties) {
     try {
-      if (id && newUserProperties) {
-        const updated = usersModel.update(id, newUserProperties)
-        res
-          .status(200)
-          .json(updated)
-      } else {
-        res
-          .status(400)
-          .json({message: 'Wrong parameter'})
-      }
+      const updated = usersModel.update(id, newUserProperties)
+      res
+        .status(200)
+        .json(updated)
+
     } catch (exc) {
+
       if (exc.message === 'user.not.found') {
         res
           .status(404)
           .json({message: `User not found with id ${id}`})
-      } else if (exc.message === 'user.not.valid') {
+      } else {
         res
           .status(400)
           .json({message: 'Invalid user data'})
@@ -100,6 +102,8 @@ router.patch('/:id', function (req, res, next) {
 /* REMOVE a specific user by id */
 router.delete('/:id', function (req, res, next) {
   const id = req.params.id
+
+  /* istanbul ignore else */
   if (id) {
     try {
       usersModel.remove(id)
@@ -108,6 +112,7 @@ router.delete('/:id', function (req, res, next) {
         .status(200)
         .end()
     } catch (exc) {
+      /* istanbul ignore else */
       if (exc.message === 'user.not.found') {
         res
           .status(404)

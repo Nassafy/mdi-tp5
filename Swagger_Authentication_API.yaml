@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0-oas3"
-  title: Swagger Authentication API
+  version: '1.0.0-oas3'
+  title: OpenAPI Authentication API
   description: Authentication API to provide server access.
-    
+
 paths:
   /v1/auth/login:
     post:
@@ -13,6 +13,14 @@ paths:
       description: >-
         The login API put credentials and get JWT access token if access is
         granted
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+        description: The user login and password
+        required: true
+
       responses:
         '200':
           description: OK
@@ -26,14 +34,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Credentials'
-        description: The user login and password
-        required: true
-        
+
   /v1/auth/verifyaccess:
     get:
       tags:
@@ -42,8 +43,8 @@ paths:
       description: >-
         The verifyaccess API should return OK if access is granted to the user,
         UNAUTHORIZED otherwise. The access_token should be present in the header of the request (Authorization : bearer access_token)
-      security: 
-        - bearerAuth: [] 
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -61,11 +62,11 @@ paths:
     get:
       tags:
         - Get the users list
-      summary: Get all the users
+      summary: Get all the users (but without password property !)
       description: >-
-        The access_token should be present in the header of the request (Authorization : bearer access_token). 
-      security: 
-        - bearerAuth: [] 
+        The access_token should be present in the header of the request (Authorization : bearer access_token).
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -84,9 +85,9 @@ paths:
         - Add a new user
       summary: Create a new user
       description: >-
-        The new user is created, on the server. The password should not be stored on the server, just the hash should be store ! The access_token should be present in the header of the request (Authorization : bearer access_token). 
-      security: 
-        - bearerAuth: [] 
+        The new user is created, on the server. The password should not be stored on the server, just the hash should be store ! The access_token should be present in the header of the request (Authorization : bearer access_token).
+      security:
+        - bearerAuth: []
       responses:
         '201':
           description: OK
@@ -107,10 +108,10 @@ paths:
               $ref: '#/components/schemas/UserToCreate'
         description: The name, the login and the user password
         required: true
-        
+
   /v1/users/{userId}:
     get:
-      parameters: 
+      parameters:
         - in: path
           name: userId
           schema:
@@ -119,11 +120,11 @@ paths:
           description: ID of the user to get
       tags:
         - Get a user
-      summary: Get a user
+      summary: Get a user (but without password property !)
       description: >-
-        Get user's properties (name, login)! The access_token should be present in the header of the request (Authorization : bearer access_token). 
-      security: 
-        - bearerAuth: [] 
+        Get user's properties (name, login, age)! The access_token should be present in the header of the request (Authorization : bearer access_token).
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -143,9 +144,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-                
+
     patch:
-      parameters: 
+      parameters:
         - in: path
           name: userId
           schema:
@@ -156,9 +157,9 @@ paths:
         - Update a user
       summary: Update a user
       description: >-
-        Update user properties (name, password)! The access_token should be present in the header of the request (Authorization : bearer access_token). 
-      security: 
-        - bearerAuth: [] 
+        Update user properties (name, password)! The access_token should be present in the header of the request (Authorization : bearer access_token).
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -187,7 +188,7 @@ paths:
         required: true
 
     delete:
-      parameters: 
+      parameters:
         - in: path
           name: userId
           schema:
@@ -198,9 +199,9 @@ paths:
         - Delete a user
       summary: Delete a user
       description: >-
-        Delete the user identified by it's userId! The access_token should be present in the header of the request (Authorization : bearer access_token). 
-      security: 
-        - bearerAuth: [] 
+        Delete the user identified by it's userId! The access_token should be present in the header of the request (Authorization : bearer access_token).
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: OK
@@ -222,9 +223,16 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 servers:
-  - url: 'https://virtserver.swaggerhub.com/stfanmichel18/Authentication/1.0.0'
-  - url: 'http://virtserver.swaggerhub.com/stfanmichel18/Authentication/1.0.0'
+  - url: 'http://localhost:3000'
+  - url: 'https://localhost'
+
 components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: 'http'
+      scheme: 'bearer'
+      key: 'Authorization'
+      bearerFormat: 'JWT' # optional, arbitrary value for documentation purposes
   schemas:
     Credentials:
       type: object
@@ -286,7 +294,7 @@ components:
           type: number
     Users:
       type: array
-      items: 
+      items:
         $ref: '#/components/schemas/User'
       example:
         - id: '4ea5a-4a5a6a-d8d8d'

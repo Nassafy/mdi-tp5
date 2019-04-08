@@ -1,7 +1,19 @@
+<<<<<<< HEAD
 const uuidv1 = require("uuid/v1");
 const bcrypt = require("bcrypt");
 
 const salt_round = 10;
+=======
+const uuidv1 = require('uuid/v1')
+const tcomb = require('tcomb')
+
+const USER = tcomb.struct({
+    id: tcomb.String,
+    name: tcomb.String,
+    login: tcomb.String,
+    age: tcomb.Number
+}, {strict: true})
+>>>>>>> 5118d5a7c899538bfbe5a59b83c47430a500dfd0
 
 const users = [
   {
@@ -97,11 +109,17 @@ const remove = id => {
 };
 
 function validateUser(user) {
-  let result = true;
-  if (user && user.id && user.login && user.name && user.password) {
-    result = true;
-  }
-  return result;
+    let result = false
+    /* istanbul ignore else */
+    if (user) {
+        try {
+            const tcombUser = USER(user)
+            result = true
+        } catch (exc) {
+            result = false
+        }
+    }
+    return result
 }
 
 exports.get = get;
