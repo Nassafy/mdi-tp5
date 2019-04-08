@@ -17,20 +17,41 @@ const get_hash = username => {
 };
 
 const login = (username, password) => {
-  hash = get_hash(username);
-  if (hash != undefined && bcrypt.compareSync(password, hash)) {
-    return jwt.sign(username, secret, { algorithm: "HS256" });
-  } else {
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    hash = get_hash(username);
+    if (!hash) {
+      reject();
+    } else {
+      bcrypt
+        .compare(password, hash)
+        .then(compare => {
+          if (compare) {
+            token = jwt.sign(username, secret, (err, token) => {
+              if (err) {
+                reject();
+              } else {
+                resolve(token);
+              }
+            });
+          } else {
+            reject();
+          }
+        })
+        .catch(() => reject());
+    }
+  });
 };
 
 const verifyacess = token => {
-  try {
-    const decoded = jwt.verify(token, secret);
-  } catch (err) {
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        reject();
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
 };
 
 module.exports = model => {

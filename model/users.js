@@ -1,19 +1,18 @@
-<<<<<<< HEAD
 const uuidv1 = require("uuid/v1");
+const tcomb = require("tcomb");
 const bcrypt = require("bcrypt");
-
 const salt_round = 10;
-=======
-const uuidv1 = require('uuid/v1')
-const tcomb = require('tcomb')
 
-const USER = tcomb.struct({
+const USER = tcomb.struct(
+  {
     id: tcomb.String,
     name: tcomb.String,
     login: tcomb.String,
+    password: tcomb.String,
     age: tcomb.Number
-}, {strict: true})
->>>>>>> 5118d5a7c899538bfbe5a59b83c47430a500dfd0
+  },
+  { strict: true }
+);
 
 const users = [
   {
@@ -53,50 +52,76 @@ const getAll = () => {
 };
 
 const add = user => {
-  password = bcrypt.hashSync(user.password, salt_round);
-
-  const newUser = {
-    ...user,
-    id: uuidv1(),
-    password: password
-  };
-  if (validateUser(newUser)) {
-    users.push(newUser);
-  } else {
-    throw new Error("user.not.valid");
-  }
-  return newUser;
+  return new Promise((resolve, reject) => {
+    bcrypt
+      .hash(user.password, salt_round)
+      .then(hash => {
+        const newUser = {
+          ...user,
+          id: uuidv1(),
+          password: password
+        };
+        if (validateUser(newUser)) {
+          users.push(newUser);
+        } else {
+          throw new Error("user.not.valid");
+        }
+        resolve(newUser);
+      })
+      .catch(err => {
+        reject();
+      });
+  });
 };
 
 const update = (id, newUserProperties) => {
-  const usersFound = users.filter(user => user.id === id);
+  return new Promise((resolve, reject) => {
+    const usersFound = users.filter(user => user.id === id);
 
-  if (usersFound.length === 1) {
-    const oldUser = usersFound[0];
+    if (usersFound.length === 1) {
+      const oldUser = usersFound[0];
 
-    if (newUserProperties.password) {
-      newUserProperties.password = bcrypt.hashSync(
-        newUserProperties.password,
-        salt_round
-      );
-    }
-    const newUser = {
-      ...oldUser,
-      ...newUserProperties
-    };
-
-    // Control data to patch
-    if (validateUser(newUser)) {
-      // Object.assign permet d'éviter la suppression de l'ancien élément puis l'ajout
-      // du nouveau Il assigne à l'ancien objet toutes les propriétés du nouveau
-      Object.assign(oldUser, newUser);
-      return oldUser;
+      if (newUserProperties.password) {
+        bcrypt
+          .hash(newUserProperties.password, salt_round)
+          .then(hash => {
+            newUserProperties.password = hash;
+            const newUser = {
+              ...oldUser,
+              ...newUserProperties
+            };
+            // Control data to patch
+            if (validateUser(newUser)) {
+              // Object.assign permet d'éviter la suppression de l'ancien élément puis l'ajout
+              // du nouveau Il assigne à l'ancien objet toutes les propriétés du nouveau
+              Object.assign(oldUser, newUser);
+              resolve(oldUser);
+            } else {
+              reject("user.not.valid");
+            }
+          })
+          .catch(err => {
+            console.log("Error during hashing: " + err);
+          });
+      } else {
+        const newUser = {
+          ...oldUser,
+          ...newUserProperties
+        };
+        // Control data to patch
+        if (validateUser(newUser)) {
+          // Object.assign permet d'éviter la suppression de l'ancien élément puis l'ajout
+          // du nouveau Il assigne à l'ancien objet toutes les propriétés du nouveau
+          Object.assign(oldUser, newUser);
+          resolve(oldUser);
+        } else {
+          reject("user.not.valid");
+        }
+      }
     } else {
-      throw new Error("user.not.valid");
+      reject("user.not.found");
     }
-  } else {
-    throw new Error("user.not.found");
-  }
+  });
 };
 
 const remove = id => {
@@ -109,17 +134,17 @@ const remove = id => {
 };
 
 function validateUser(user) {
-    let result = false
-    /* istanbul ignore else */
-    if (user) {
-        try {
-            const tcombUser = USER(user)
-            result = true
-        } catch (exc) {
-            result = false
-        }
+  let result = false;
+  /* istanbul ignore else */
+  if (user) {
+    try {
+      const tcombUser = USER(user);
+      result = true;
+    } catch (exc) {
+      result = false;
     }
-    return result
+  }
+  return result;
 }
 
 exports.get = get;
