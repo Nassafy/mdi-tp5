@@ -11,6 +11,7 @@ const logger = loggerModel(usersModel);
 
 const app = express();
 
+
 app.use(bodyParser.json());
 
 // Activation de Helmet
