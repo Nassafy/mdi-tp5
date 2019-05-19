@@ -11,7 +11,7 @@ let login = callback => {
     .post("/v1/auth/login")
     .send({ login: "rose", password: "vert" })
     .end((err, res) => {
-      let token = res.body.access_token;
+      const token = res.body.access_token;
       callback(token);
     });
 };
